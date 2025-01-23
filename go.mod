@@ -1,4 +1,4 @@
-module github.com/terraform-linters/tflint-ruleset-template
+module github.com/styumyum/tflint-ruleset-yumyum
 
 go 1.23
 
