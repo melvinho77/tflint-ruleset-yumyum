@@ -7,7 +7,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
-func Test_TerraformModulesSyntax(t *testing.T) {
+func Test_TerraformMetaArguments(t *testing.T) {
 	tests := []struct {
 		Name     string
 		Content  string
@@ -166,7 +166,7 @@ module "my_module" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformMetaArguments(),
-					Message: "Invalid 'source' argument arrangement in module 'my_module'",
+					Message: "module 'my_module' has invalid 'source' meta argument arrangement",
 					Range: hcl.Range{
 						Filename: "main.tf",
 						Start:    hcl.Pos{Line: 5, Column: 3},
@@ -188,7 +188,7 @@ resource "foo" "my_resource" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformMetaArguments(),
-					Message: "Invalid 'count' argument arrangement in resource 'foo.my_resource'",
+					Message: "resource 'foo.my_resource' has invalid 'count' meta argument arrangement",
 					Range: hcl.Range{
 						Filename: "main.tf",
 						Start:    hcl.Pos{Line: 5, Column: 3},
@@ -212,7 +212,7 @@ resource "foo" "my_resource" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformMetaArguments(),
-					Message: "Invalid 'lifecycle' argument arrangement in resource 'foo.my_resource'",
+					Message: "resource 'foo.my_resource' has invalid 'lifecycle' meta argument arrangement",
 					Range: hcl.Range{
 						Filename: "main.tf",
 						Start:    hcl.Pos{Line: 7, Column: 3},
@@ -236,7 +236,7 @@ module "my_module" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformMetaArguments(),
-					Message: "Invalid 'count' argument arrangement in module 'my_module'",
+					Message: "module 'my_module' has invalid 'count' meta argument arrangement",
 					Range: hcl.Range{
 						Filename: "main.tf",
 						Start:    hcl.Pos{Line: 7, Column: 3},
@@ -255,7 +255,7 @@ module "my_module" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformMetaArguments(),
-					Message: "Missing new line after 'source' in module 'my_module'",
+					Message: "module 'my_module' has missing new line after meta argument 'source'",
 					Range: hcl.Range{
 						Filename: "main.tf",
 						Start:    hcl.Pos{Line: 3, Column: 3},
@@ -276,7 +276,7 @@ module "my_module" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformMetaArguments(),
-					Message: "Missing new line after 'count' in module 'my_module'",
+					Message: "module 'my_module' has missing new line after meta argument 'count'",
 					Range: hcl.Range{
 						Filename: "main.tf",
 						Start:    hcl.Pos{Line: 5, Column: 3},
@@ -299,7 +299,7 @@ module "my_module" {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTerraformMetaArguments(),
-					Message: "Missing new line after 'providers' in module 'my_module'",
+					Message: "module 'my_module' has missing new line after meta argument 'providers'",
 					Range: hcl.Range{
 						Filename: "main.tf",
 						Start:    hcl.Pos{Line: 7, Column: 3},

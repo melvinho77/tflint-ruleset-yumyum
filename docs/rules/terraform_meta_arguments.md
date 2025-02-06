@@ -1,12 +1,11 @@
 # terraform_meta_arguments
 
-## Rule definition
 Check the sequences and format of 'source', 'count', 'for_each', 'providers' and
 'provider' meta arguments in Terraform modules, resources and data sources.
 
-## Modules
+## Terraform modules
 ### Format
-Check the beginning arguments sequences in Terraform modules as the following:
+- Check the beginning arguments sequences in Terraform modules as the following:
   1. module definition *(end with newline)*
   2. source *(end with newline)*
   3. -- if count or for_each exist --
@@ -44,7 +43,7 @@ module "aws_ec2_instance" {
 }
 ```
 
-## Resources and data sources
+## Terraform resources and data sources
 ### Format
 - Check the beginning arguments sequences in Terraform resources and data sources
   as the following:
@@ -52,7 +51,7 @@ module "aws_ec2_instance" {
   2. -- if count or for_each exist --
       1. count/for_each *(end with newline)*
       2. *(extra newline)*
-  3. -- if count or for_each exist --
+  3. -- if provider exist --
       1. provider *(end with newline)*
       2. *(extra newline)*
   4. other attributes/blocks

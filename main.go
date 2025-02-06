@@ -9,10 +9,11 @@ import (
 func main() {
 	plugin.Serve(&plugin.ServeOpts{
 		RuleSet: &tflint.BuiltinRuleSet{
-			Name:    "template",
+			Name:    "yumyum",
 			Version: "0.1.0",
 			Rules: []tflint.Rule{
 				rules.NewTerraformMetaArguments(),
+				rules.NewTerraformAnyTypeVariables(),
 			},
 		},
 	})
