@@ -1,6 +1,6 @@
 # terraform_any_type_variables
 
-Disallow `variable` declarations with type 'any'.
+Disallow `variable` declarations with type `any`.
 
 ## Configuration
 
@@ -16,7 +16,7 @@ rule checking.
 
 ## Example
 
-### Default - enforce disallow `variable` declarations with type 'any'.
+### Default - enforce disallow `variable` declarations with type `any`.
 
 #### Rule configuration
 
