@@ -14,6 +14,8 @@ func main() {
 			Rules: []tflint.Rule{
 				rules.NewTerraformMetaArguments(),
 				rules.NewTerraformAnyTypeVariables(),
+				rules.NewTerraformRequiredTags(),
+				rules.NewTerraformModuleDependencies(),
 			},
 		},
 	})
