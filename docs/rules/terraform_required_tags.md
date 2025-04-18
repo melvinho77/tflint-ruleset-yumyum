@@ -16,7 +16,7 @@ The `tags` option defines the list of tags that needs to be included for any res
 
 #### `excluded_resources`
 
-The `excluded_resources` optionn defines the list of resources type to be ignored in ths rule checking.
+The `excluded_resources` option defines the list of resources type to be ignored in ths rule checking.
 
 ## Example
 
