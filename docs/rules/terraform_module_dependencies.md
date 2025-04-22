@@ -4,11 +4,11 @@ Check whether `module` sources have explicitly pinned to a sepcific version usin
 
 ## Configuration
 
-| Name             | Default | Value          |
-| ---------------- | ------- | -------------- |
-| enabled          | true    | Bool           |
-| style            | ""      | String         |
-| default_branches | []      | List of string |
+| Name             | Default                       | Value          |
+| ---------------- | ----------------------------- | -------------- |
+| enabled          | true                          | Bool           |
+| style            | "semver"                      | String         |
+| default_branches | ["main", "master", "default"] | List of string |
 
 #### `style`
 

@@ -4,11 +4,11 @@ Check whether `resources` have required tags labeled for resources with the `tag
 
 ## Configuration
 
-| Name               | Default | Value          |
-| ------------------ | ------- | -------------- |
-| enabled            | true    | Bool           |
-| tags               | []      | List of string |
-| excluded_resources | []      | List of string |
+| Name               | Default                                                                                           | Value          |
+| ------------------ | ------------------------------------------------------------------------------------------------- | -------------- |
+| enabled            | true                                                                                              | Bool           |
+| tags               | ["brand", "env", "project", "devops_project_kind", "devops_project_group", "devops_project_name"] | List of string |
+| excluded_resources | []                                                                                                | List of string |
 
 #### `tags`
 
