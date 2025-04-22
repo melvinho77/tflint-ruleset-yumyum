@@ -50,6 +50,14 @@ func (r *TerraformModuleDependencies) Link() string {
 func (r *TerraformModuleDependencies) Check(runner tflint.Runner) error {
 	config := &terraformModuleDependenciesConfig{}
 
+	if config.Style == "" {
+		config.Style = "semver"
+	}
+
+	if len(config.DefaultBranches) == 0 {
+		config.DefaultBranches = append(config.DefaultBranches, []string{"main", "master", "default"}...)
+	}
+
 	if err := runner.DecodeRuleConfig(r.Name(), config); err != nil {
 		return err
 	}
