@@ -34,6 +34,7 @@ resource "my_resource" "my_resource_name" {
   }
 }
 `,
+			Config:   testTerraformRequiredTagsConfig,
 			Expected: helper.Issues{},
 		},
 		{

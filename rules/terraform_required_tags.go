@@ -20,7 +20,7 @@ func NewTerraformRequiredTags() *TerraformRequiredTags {
 }
 
 type terraformRequiredTagsConfig struct {
-	Tags              []string `hclext:"tags"`
+	Tags              []string `hclext:"tags,optional"`
 	ExcludedResources []string `hclext:"excluded_resources,optional"`
 }
 
@@ -47,6 +47,12 @@ func (r *TerraformRequiredTags) Link() string {
 // Check checks whether resources have the required tags if applicable
 func (r *TerraformRequiredTags) Check(runner tflint.Runner) error {
 	config := &terraformRequiredTagsConfig{}
+
+	fmt.Printf("DEBUG - config.Tags: %#v (len: %d)\n", config.Tags, len(config.Tags))
+
+	if len(config.Tags) == 0 {
+		config.Tags = append(config.Tags, []string{"brand", "env", "project", "devops_project_kind", "devops_project_group", "devops_project_name"}...)
+	}
 
 	if err := runner.DecodeRuleConfig(r.Name(), config); err != nil {
 		return err
