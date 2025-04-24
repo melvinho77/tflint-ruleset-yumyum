@@ -1,6 +1,6 @@
 # terraform_required_variables
 
-Check whether ``
+Check whether the list of variables declared in `required_vars` are also declared in the Terraform module.
 
 ## Configuration
 
