@@ -19,7 +19,8 @@ func Test_TerraformModuleDependencies(t *testing.T) {
 			Content: `
 module "my_module" {
   name = "my_name"
-}`,
+}
+  `,
 			Expected: helper.Issues{},
 		},
 		{
