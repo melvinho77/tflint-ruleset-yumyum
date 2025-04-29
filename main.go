@@ -16,7 +16,8 @@ func main() {
 				rules.NewTerraformAnyTypeVariables(),
 				rules.NewTerraformRequiredTags(),
 				rules.NewTerraformModuleDependencies(),
-				// rules.NewTerraformNamingStandards(),
+				rules.NewTerraformNamingStandards(),
+				rules.NewTerraformRequiredVariables(),
 			},
 		},
 	})
