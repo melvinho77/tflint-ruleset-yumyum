@@ -1,3 +1,5 @@
+---
+
 # This is an example goreleaser.yaml file with some sane defaults.
 # Make sure to check the documentation at http://goreleaser.com
 version: 2
@@ -17,16 +19,38 @@ builds:
       post:
         - mkdir -p ./dist/raw
         - cp "{{ .Path }}" "./dist/raw/{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+
 archives:
   - id: zip
     name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     format: zip
     files:
       - none*
+
 checksum:
   name_template: 'checksums.txt'
   extra_files:
     - glob: ./dist/raw/*
 signs:
-  - artifacts: checksum
-    args: ["--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}"]
+  - cmd: cosign
+    signature: '${artifact}.keyless.sig'
+    certificate: '${artifact}.pem'
+    output: true
+    artifacts: checksum
+    args:
+      - sign-blob
+      - '--output-certificate=${certificate}'
+      - '--output-signature=${signature}'
+      - '${artifact}'
+      - --yes
+
+release:
+  github:
+    owner: myklst
+    name: tflint-ruleset-myklst
+
+snapshot:
+  version_template: "{{ .Tag }}-dev"
+
+changelog:
+  disable: true
