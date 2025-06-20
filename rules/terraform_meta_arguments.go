@@ -178,13 +178,18 @@ func (r *TerraformMetaArguments) Check(runner tflint.Runner) error {
 			var providerExist bool
 			var provider *hcl.Attribute
 			var errMsg string
-			if fileContent.Type == "module" {
+
+			switch fileContent.Type {
+			case "module":
 				provider, providerExist = content.Attributes["providers"]
-				errMsg = fmt.Sprintf("%s '%s' has invalid 'providers' meta argument arrangement", fileContent.Type, strings.Join(fileContent.Labels, "."))
-			} else if fileContent.Type == "resource" || fileContent.Type == "data" {
+				errMsg = fmt.Sprintf("%s '%s' has invalid 'providers' meta argument arrangement",
+					fileContent.Type, strings.Join(fileContent.Labels, "."))
+			case "resource", "data": // Combined case since they have identical handling
 				provider, providerExist = content.Attributes["provider"]
-				errMsg = fmt.Sprintf("%s '%s' has invalid 'provider' meta argument arrangement", fileContent.Type, strings.Join(fileContent.Labels, "."))
+				errMsg = fmt.Sprintf("%s '%s' has invalid 'provider' meta argument arrangement",
+					fileContent.Type, strings.Join(fileContent.Labels, "."))
 			}
+
 			if providerExist {
 				checkLine := currentRange.End.Line
 				if sourceExist || countExist || forEachExist {

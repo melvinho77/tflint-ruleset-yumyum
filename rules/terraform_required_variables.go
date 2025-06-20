@@ -109,11 +109,14 @@ func (r *TerraformRequiredVariables) Check(runner tflint.Runner) error {
 
 		sensitiveAttr, sensitiveExist := variable.Body.Attributes["sensitive"]
 		if !sensitiveExist {
-			runner.EmitIssue(
+			err := runner.EmitIssue(
 				r,
 				fmt.Sprintf("variable `%s` is missing the `sensitive` attribute", variable.Labels[0]),
 				variable.DefRange,
 			)
+			if err != nil {
+				return err
+			}
 
 			continue
 		}
@@ -124,11 +127,14 @@ func (r *TerraformRequiredVariables) Check(runner tflint.Runner) error {
 		}
 
 		if !sensitiveValue.Val.True() {
-			runner.EmitIssue(
+			err := runner.EmitIssue(
 				r,
 				fmt.Sprintf("variable `%s` must have `sensitive = true` attribute defined", variable.Labels[0]),
 				sensitiveAttr.Range,
 			)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

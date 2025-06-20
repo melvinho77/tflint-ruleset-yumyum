@@ -75,7 +75,7 @@ func (r *TerraformRequiredTags) Check(runner tflint.Runner) error {
 	var localTags cty.Value
 
 	if localTagsAttr == nil {
-		runner.EmitIssue(
+		err := runner.EmitIssue(
 			r,
 			"missing required local variable `tags`",
 			hcl.Range{
@@ -83,6 +83,9 @@ func (r *TerraformRequiredTags) Check(runner tflint.Runner) error {
 				End:   hcl.Pos{Line: 1, Column: 1},
 			},
 		)
+		if err != nil {
+			return err
+		}
 	} else {
 		err := runner.EvaluateExpr(localTagsAttr.Expr, func(val cty.Value) error {
 			localTags = val
@@ -167,11 +170,15 @@ func (r *TerraformRequiredTags) Check(runner tflint.Runner) error {
 					tagKeys = append(tagKeys, k)
 				}
 			} else {
-				runner.EmitIssue(
+				err := runner.EmitIssue(
 					r,
 					fmt.Sprintf("unsupported function '%s' used in tags, only 'merge' is allowed", expr.Name),
 					tagsAttr.Expr.Range(),
 				)
+				if err != nil {
+					return err
+				}
+
 				continue
 			}
 
@@ -186,11 +193,14 @@ func (r *TerraformRequiredTags) Check(runner tflint.Runner) error {
 					}
 				}
 			} else {
-				runner.EmitIssue(
+				err := runner.EmitIssue(
 					r,
 					fmt.Sprintf("unsupported variable '%s' used in tags, only 'local.tags' is allowed", expr.Traversal.RootName()),
 					tagsAttr.Expr.Range(),
 				)
+				if err != nil {
+					return err
+				}
 				continue
 			}
 
@@ -219,20 +229,26 @@ func (r *TerraformRequiredTags) Check(runner tflint.Runner) error {
 		}
 
 		if len(missing) > 0 {
-			runner.EmitIssue(
+			err := runner.EmitIssue(
 				r,
 				fmt.Sprintf("%s '%s' is missing required tags: [%s]", resource.Labels[0], resource.Labels[1], strings.Join(missing, ", ")),
 				tagsAttr.Expr.Range(),
 			)
+			if err != nil {
+				return err
+			}
 		}
 
 		// If resource is AWS Cloud resource, check if `Name` tag key exists
 		if r.isAwsResource(resource.Labels[0]) && !slices.Contains(tagKeys, "Name") {
-			runner.EmitIssue(
+			err := runner.EmitIssue(
 				r,
 				fmt.Sprintf("%s '%s' is missing required tag: Name", resource.Labels[0], resource.Labels[1]),
 				tagsAttr.Expr.Range(),
 			)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
