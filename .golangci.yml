@@ -1,0 +1,34 @@
+version: "2"
+linters:
+  enable:
+    - copyloopvar
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - staticcheck
+        path: terraform/
+      - linters:
+          - staticcheck
+        text: 'ST1005:' # allow capitlized error strings
+    paths:
+      - terraform/
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gci
+    - gofmt
+  exclusions:
+    generated: lax
+    paths:
+      - terraform/
+      - third_party$
+      - builtin$
+      - examples$
