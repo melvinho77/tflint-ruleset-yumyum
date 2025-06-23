@@ -68,8 +68,8 @@ jobs:
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
-      - name: Install cosign
-        uses: sigstore/cosign-installer@11f2691f9a9e5eb0ae6c6b3f6470468a0a9a3e60 # v3.1.1
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@3454372f43399081ed03b604cb2d021dabca52bb # v3.8.2
         with:
           cosign-release: 'v2.5.2'
       - name: Run GoReleaser
