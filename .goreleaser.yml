@@ -46,8 +46,10 @@ signs:
 
 release:
   github:
-    owner: myklst
-    name: tflint-ruleset-myklst
+    # owner: myklst
+    # name: tflint-ruleset-myklst
+    owner: melvinho77
+    name: tflint-ruleset-yumyum
 
 snapshot:
   version_template: "{{ .Tag }}-dev"
