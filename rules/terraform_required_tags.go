@@ -73,6 +73,7 @@ func (r *TerraformRequiredTags) Check(runner tflint.Runner) error {
 	}
 
 	var localTags cty.Value
+	var localTagKeys []string
 
 	if localTagsAttr == nil {
 		err := runner.EmitIssue(
@@ -95,8 +96,14 @@ func (r *TerraformRequiredTags) Check(runner tflint.Runner) error {
 			return err
 		}
 
+		// Store all the key from `local.tags` if applicable
 		if !localTags.IsKnown() || localTags.IsNull() || !localTags.CanIterateElements() {
 			return nil
+		} else {
+			for it := localTags.ElementIterator(); it.Next(); {
+				k, _ := it.Element()
+				localTagKeys = append(localTagKeys, k.AsString())
+			}
 		}
 	}
 
@@ -130,6 +137,7 @@ func (r *TerraformRequiredTags) Check(runner tflint.Runner) error {
 
 		var tagKeys []string
 		var evalErr error
+		useLocalTags := false
 
 		switch expr := tagsAttr.Expr.(type) {
 		// Usage of function calls like merge(local.tags, { ... })
@@ -138,14 +146,9 @@ func (r *TerraformRequiredTags) Check(runner tflint.Runner) error {
 				merged := map[string]struct{}{}
 
 				for _, arg := range expr.Args {
-					// If the argument is `local.tags`, use the pre-evaluated value
+					// If the argument is `local.tags`, skip the checking as it is already done when we first retrieve `local.tags` attribute
 					if varExpr, ok := arg.(*hclsyntax.ScopeTraversalExpr); ok && varExpr.Traversal.RootName() == "local" {
-						if localTags.IsKnown() && localTags.CanIterateElements() {
-							for it := localTags.ElementIterator(); it.Next(); {
-								k, _ := it.Element()
-								merged[k.AsString()] = struct{}{}
-							}
-						}
+						useLocalTags = true
 						continue
 					}
 
@@ -186,12 +189,7 @@ func (r *TerraformRequiredTags) Check(runner tflint.Runner) error {
 		// E.g. tags = local.tags
 		case *hclsyntax.ScopeTraversalExpr:
 			if expr.Traversal.RootName() == "local" {
-				if localTags.IsKnown() && localTags.CanIterateElements() {
-					for it := localTags.ElementIterator(); it.Next(); {
-						k, _ := it.Element()
-						tagKeys = append(tagKeys, k.AsString())
-					}
-				}
+				useLocalTags = true
 			} else {
 				err := runner.EmitIssue(
 					r,
@@ -201,6 +199,7 @@ func (r *TerraformRequiredTags) Check(runner tflint.Runner) error {
 				if err != nil {
 					return err
 				}
+
 				continue
 			}
 
@@ -220,14 +219,24 @@ func (r *TerraformRequiredTags) Check(runner tflint.Runner) error {
 			return evalErr
 		}
 
-		// Compared missing tags with required tags
 		var missing []string
+
+		// If the resource uses local.tags, merge localTagKeys into tagKeys
+		if useLocalTags {
+			for _, key := range localTagKeys {
+				if !slices.Contains(tagKeys, key) {
+					tagKeys = append(tagKeys, key)
+				}
+			}
+		}
+
 		for _, requiredTags := range config.Tags {
 			if !slices.Contains(tagKeys, requiredTags) {
 				missing = append(missing, requiredTags)
 			}
 		}
 
+		// Output linting error if any missing tags are present
 		if len(missing) > 0 {
 			err := runner.EmitIssue(
 				r,
