@@ -31,18 +31,18 @@ checksum:
   name_template: 'checksums.txt'
   extra_files:
     - glob: ./dist/raw/*
+
 signs:
-  - cmd: cosign
-    signature: '${artifact}.keyless.sig'
-    certificate: '${artifact}.pem'
-    output: true
+  - cmd: gpg
     artifacts: checksum
     args:
-      - sign-blob
-      - '--output-certificate=${certificate}'
-      - '--output-signature=${signature}'
-      - '${artifact}'
+      - --batch
       - --yes
+      - --armor
+      - --detach-sign
+      - --output
+      - "${artifact}.sig"
+      - "${artifact}"
 
 release:
   github:
