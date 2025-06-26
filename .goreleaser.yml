@@ -36,13 +36,13 @@ signs:
   - cmd: gpg
     artifacts: checksum
     args:
-      - --batch
-      - --yes
-      - --armor
-      - --detach-sign
-      - --output
-      - "${artifact}.sig"
-      - "${artifact}"
+      - '--batch'
+      - '--local-user'
+      - '{{ .Env.GPG_FINGERPRINT }}'
+      - '--output'
+      - '${signature}'
+      - '--detach-sign'
+      - '${artifact}'
 
 release:
   github:
