@@ -82,12 +82,10 @@ func (r *TerraformAnyTypeVariables) Check(runner tflint.Runner) error {
 
 		for _, typeExpr := range typeAttr.Expr.Variables() {
 			if typeExpr.RootName() == "any" {
-				err := runner.EmitIssue(
-					r,
+				if err := runner.EmitIssue(r,
 					fmt.Sprintf("variable '%s' has 'any' type declared", variable.Labels[0]),
 					typeExpr.SourceRange(),
-				)
-				if err != nil {
+				); err != nil {
 					return err
 				}
 			}

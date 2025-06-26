@@ -101,10 +101,9 @@ module "my_module" {
   name   = "my_name"
 }`,
 			Config: `
-rule "terraform_module_dependencies" {
+rule "terraform_module_source_version" {
   enabled          = true
-  style            = "semver"
-  default_branches = []
+  allowed_versions = []
 }
 `,
 			Expected: helper.Issues{},
@@ -117,10 +116,9 @@ module "my_module" {
   name   = "my_name"
 }`,
 			Config: `
-rule "terraform_module_dependencies" {
+rule "terraform_module_source_version" {
   enabled          = true
-  style            = "semver"
-  default_branches = []
+  allowed_versions = []
 }
 `,
 			Expected: helper.Issues{},
@@ -185,6 +183,48 @@ module "my_module" {
 				},
 			},
 		},
+		{
+			Name: "git module reference is pinned with an valid pattern, config used exact strings.",
+			Content: `
+module "my_module" {
+  source = "git::https://gitlab.example.com/test.git?ref=feature/1234"
+  name   = "my_name"
+}`,
+			Config: `
+
+rule "terraform_module_source_version" {
+  enabled          = true
+  allowed_versions = ["feature/1234", "bugfix/5678"]
+}
+			`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "git module reference is pinned with an invalid pattern, config used exact strings.",
+			Content: `
+module "my_module" {
+  source = "git::https://gitlab.example.com/test.git?ref=bugfix/1234"
+  name   = "my_name"
+}`,
+			Config: `
+
+rule "terraform_module_source_version" {
+  enabled          = true
+  allowed_versions = ["feature/1234", "bugfix/5678"]
+}
+			`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformModuleSourceVersion(),
+					Message: "module 'my_module' source 'git::https://gitlab.example.com/test.git?ref=bugfix/1234' [ref='bugfix/1234'] does not match any allowed_versions pattern",
+					Range: hcl.Range{
+						Filename: "main.tf",
+						Start:    hcl.Pos{Line: 3, Column: 12},
+						End:      hcl.Pos{Line: 3, Column: 70},
+					},
+				},
+			},
+		},
 	}
 
 	rule := NewTerraformModuleSourceVersion()
@@ -206,6 +246,7 @@ module "my_module" {
 
 const testTerraformModuleSourceVersionConfig = `
 rule "terraform_module_source_version" {
-  enabled = true
+  enabled          = true
+  allowed_versions = ["^bugfix/\\d+$", "^feature/\\d+$"]
 }
 `

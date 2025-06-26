@@ -50,10 +50,6 @@ func (r *TerraformModuleSourceVersion) Link() string {
 func (r *TerraformModuleSourceVersion) Check(runner tflint.Runner) error {
 	config := &TerraformModuleSourceVersionConfig{}
 
-	if len(config.AllowedVersions) == 0 {
-		config.AllowedVersions = append(config.AllowedVersions, "^bugfix/\\d+$", "^feature/\\d+$")
-	}
-
 	if err := runner.DecodeRuleConfig(r.Name(), config); err != nil {
 		return err
 	}
@@ -99,17 +95,18 @@ func (r *TerraformModuleSourceVersion) Check(runner tflint.Runner) error {
 
 		u, err := url.ParseRequestURI(source)
 		if err != nil {
-			_ = runner.EmitIssue(
+			if _err := runner.EmitIssue(
 				r,
 				fmt.Sprintf("module '%s' source '%s' is not a valid URL", module.Labels[0], sourceValue),
 				sourceAttr.Expr.Range(),
-			)
+			); _err != nil {
+				return _err
+			}
 			continue
 		}
 
-		switch u.Scheme {
-		case "git":
-		default:
+		// Only enforce version checks for git-based sources
+		if u.Scheme != "git" {
 			continue
 		}
 
@@ -130,15 +127,17 @@ func (r *TerraformModuleSourceVersion) Check(runner tflint.Runner) error {
 		if revision == "" {
 			revision = query.Get("rev")
 			key = "rev"
-		}
 
-		if revision == "" {
-			_ = runner.EmitIssue(
-				r,
-				fmt.Sprintf(`module '%s' source '%s' is not pinned (missing ?ref= or ?rev= in the URL).`, module.Labels[0], sourceValue),
-				sourceAttr.Expr.Range(),
-			)
-			continue
+			if revision == "" {
+				if _err := runner.EmitIssue(
+					r,
+					fmt.Sprintf(`module '%s' source '%s' is not pinned (missing ?ref= or ?rev= in the URL).`, module.Labels[0], sourceValue),
+					sourceAttr.Expr.Range(),
+				); _err != nil {
+					return _err
+				}
+				continue
+			}
 		}
 
 		_, err = semver.NewVersion(revision)
@@ -153,11 +152,13 @@ func (r *TerraformModuleSourceVersion) Check(runner tflint.Runner) error {
 			}
 
 			if !allowed {
-				_ = runner.EmitIssue(
+				if _err := runner.EmitIssue(
 					r,
 					fmt.Sprintf("module '%s' source '%s' [%s='%s'] does not match any allowed_versions pattern", module.Labels[0], sourceValue, key, revision),
 					sourceAttr.Expr.Range(),
-				)
+				); _err != nil {
+					return _err
+				}
 				continue
 			}
 		}

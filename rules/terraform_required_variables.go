@@ -47,11 +47,13 @@ func (r *TerraformRequiredVariables) Link() string {
 // Check checks whether required_vars have been declared as variables within the module
 func (r *TerraformRequiredVariables) Check(runner tflint.Runner) error {
 	config := &terraformRequiredVariablesConfig{}
-	config.RequiredVars = append(config.RequiredVars, "cloud_creds", "module_info", "module_tmpl")
 
 	if err := runner.DecodeRuleConfig(r.Name(), config); err != nil {
 		return err
 	}
+
+	// Required variables according to myklst Terraform standardization
+	config.RequiredVars = append(config.RequiredVars, "cloud_creds", "module_info", "module_tmpl")
 
 	variables, err := runner.GetModuleContent(&hclext.BodySchema{
 		Blocks: []hclext.BlockSchema{

@@ -137,27 +137,24 @@ func (r *TerraformRequiredTags) Check(runner tflint.Runner) error {
 
 		var tagKeys []string
 		var evalErr error
-		useLocalTags := false
 
 		switch expr := tagsAttr.Expr.(type) {
 		// Usage of function calls like merge(local.tags, { ... })
 		case *hclsyntax.FunctionCallExpr:
 			if expr.Name == "merge" {
-				merged := map[string]struct{}{}
-
 				for _, arg := range expr.Args {
-					// If the argument is `local.tags`, skip the checking as it is already done when we first retrieve `local.tags` attribute
+					// If the argument is `local.tags`, inject keys directly
 					if varExpr, ok := arg.(*hclsyntax.ScopeTraversalExpr); ok && varExpr.Traversal.RootName() == "local" {
-						useLocalTags = true
+						tagKeys = append(tagKeys, localTagKeys...)
 						continue
 					}
 
-					// Otherwise evaluate the argument
+					// Otherwise, evaluate and extract keys
 					err := runner.EvaluateExpr(arg, func(val cty.Value) error {
 						if val.IsKnown() && val.CanIterateElements() {
 							for it := val.ElementIterator(); it.Next(); {
 								k, _ := it.Element()
-								merged[k.AsString()] = struct{}{}
+								tagKeys = append(tagKeys, k.AsString())
 							}
 						}
 						return nil
@@ -168,20 +165,8 @@ func (r *TerraformRequiredTags) Check(runner tflint.Runner) error {
 						break
 					}
 				}
-
-				for k := range merged {
-					tagKeys = append(tagKeys, k)
-				}
 			} else {
-				err := runner.EmitIssue(
-					r,
-					fmt.Sprintf("unsupported function '%s' used in tags, only 'merge' is allowed", expr.Name),
-					tagsAttr.Expr.Range(),
-				)
-				if err != nil {
-					return err
-				}
-
+				// Ignore any terraform function calls other than `merge`
 				continue
 			}
 
@@ -189,17 +174,8 @@ func (r *TerraformRequiredTags) Check(runner tflint.Runner) error {
 		// E.g. tags = local.tags
 		case *hclsyntax.ScopeTraversalExpr:
 			if expr.Traversal.RootName() == "local" {
-				useLocalTags = true
+				tagKeys = append(tagKeys, localTagKeys...)
 			} else {
-				err := runner.EmitIssue(
-					r,
-					fmt.Sprintf("unsupported variable '%s' used in tags, only 'local.tags' is allowed", expr.Traversal.RootName()),
-					tagsAttr.Expr.Range(),
-				)
-				if err != nil {
-					return err
-				}
-
 				continue
 			}
 
@@ -219,16 +195,10 @@ func (r *TerraformRequiredTags) Check(runner tflint.Runner) error {
 			return evalErr
 		}
 
-		var missing []string
+		// Remove any duplicated keys if any
+		tagKeys = slices.Compact(tagKeys)
 
-		// If the resource uses local.tags, merge localTagKeys into tagKeys
-		if useLocalTags {
-			for _, key := range localTagKeys {
-				if !slices.Contains(tagKeys, key) {
-					tagKeys = append(tagKeys, key)
-				}
-			}
-		}
+		var missing []string
 
 		for _, requiredTags := range config.Tags {
 			if !slices.Contains(tagKeys, requiredTags) {

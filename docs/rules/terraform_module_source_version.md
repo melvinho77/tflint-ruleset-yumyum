@@ -4,14 +4,17 @@ Check whether `module` sources have explicitly pinned to a semantic versioning u
 
 ## Configuration
 
-| Name             | Default                             | Value          |
-| ---------------- | ----------------------------------- | -------------- |
-| enabled          | `true`                              | Bool           |
-| allowed_versions | `["^bugfix/\d+$", "^feature/\d+$"]` | List of string |
+| Name             | Default | Value          |
+| ---------------- | ------- | -------------- |
+| enabled          | `true`  | Bool           |
+| allowed_versions | `[]`    | List of string |
 
 #### `allowed_version`
 
-The `allowed_version` option defines a list of regular expressions used to validate the `?ref=` or `?rev=` versioning in the source URL. Only versions matching on of these expressions will be allowed.
+The `allowed_version` option defines a list of regular expressions used to validate the `?ref=` or `?rev=` versioning in the source URL. Only versions matching on of these expressions will be allowed. Example Go regular expressions are as follow:
+
+- `^bugfix/\\d+$`
+- `^feature/\\d+$`
 
 ## Example
 
@@ -20,6 +23,7 @@ The `allowed_version` option defines a list of regular expressions used to valid
 ```hcl
 rule "terraform_module_source_version" {
   enabled          = true
+  allowed_versions = ["^bugfix/\\d+$", "^feature/\\d+$"]
 }
 ```
 

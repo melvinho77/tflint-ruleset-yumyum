@@ -132,6 +132,97 @@ variable "module_info" {
 				},
 			},
 		},
+		{
+			Name: "module with complete required variables and with senstitive attribute but set as false",
+			Content: `
+variable "cloud_creds" {
+  type      = string
+  sensitive = false
+}
+
+variable "module_tmpl" {
+  type      = string
+}
+
+variable "module_info" {
+  type      = string
+}
+`,
+			Config: testTerraformRequiredVariablesConfig,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformRequiredVariables(),
+					Message: "variable `cloud_creds` must have `sensitive = true` attribute defined",
+					Range: hcl.Range{
+						Filename: "main.tf",
+						Start:    hcl.Pos{Line: 4, Column: 3},
+						End:      hcl.Pos{Line: 4, Column: 20},
+					},
+				},
+			},
+		},
+		{
+			Name: "module with complete required variables, correct attributes and complete additional required custom variables.",
+			Content: `
+variable "cloud_creds" {
+  sensitive = true
+  type      = string
+}
+
+variable "module_tmpl" {
+  type = string
+}
+
+variable "module_info" {
+  type = string
+}
+
+variable "additional_required_var" {
+  type = string
+}
+`,
+			Config: `
+rule "terraform_required_variables" {
+  enabled       = true
+  required_vars = ["additional_required_var"]
+}
+`,
+			Expected: helper.Issues{},
+		},
+		{
+			Name: "module with complete required variables, correct attributes and incomplete additional required custom variables.",
+			Content: `
+variable "cloud_creds" {
+  sensitive = true
+  type      = string
+}
+
+variable "module_tmpl" {
+  type = string
+}
+
+variable "module_info" {
+  type = string
+}
+`,
+			Config: `
+rule "terraform_required_variables" {
+  enabled       = true
+  required_vars = ["additional_required_var"]
+}
+`,
+			Expected: helper.Issues{
+				{
+					Rule:    NewTerraformRequiredVariables(),
+					Message: "required variable(s) not declared: additional_required_var",
+					Range: hcl.Range{
+						Filename: "",
+						Start:    hcl.Pos{Line: 1, Column: 1},
+						End:      hcl.Pos{Line: 1, Column: 1},
+					},
+				},
+			},
+		},
 	}
 
 	rule := NewTerraformRequiredVariables()
