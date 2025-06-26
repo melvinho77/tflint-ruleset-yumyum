@@ -11,7 +11,7 @@ Check whether `module` sources have explicitly pinned to a semantic versioning u
 
 #### `allowed_version`
 
-The `allowed_version` option defines a list of regular expressions used to validate the `?ref=` or `?rev=` versioning in the source URL. Only versions matching on of these expressions will be allowed. Example Go regular expressions are as follow:
+The `allowed_version` option defines a list of regular expressions / exact strings used to validate the `?ref=` or `?rev=` versioning in the source URL. Only versions matching on of these expressions will be allowed. Example Go regular expressions are as follow:
 
 - `^bugfix/\\d+$`
 - `^feature/\\d+$`
@@ -23,7 +23,7 @@ The `allowed_version` option defines a list of regular expressions used to valid
 ```hcl
 rule "terraform_module_source_version" {
   enabled          = true
-  allowed_versions = ["^bugfix/\\d+$", "^feature/\\d+$"]
+  allowed_versions = ["^bugfix/\\d+$", "^feature/\\d+$", "bugfix/test"]
 }
 ```
 
@@ -57,6 +57,10 @@ module "my_module_5" {
 
 module "my_module_6" {
   source = "git://gitlab.example.com/test.git?ref=feature/1234"
+}
+
+module "my_module_7" {
+  source = "git://gitlab.example.com/test.git?ref=bugfix/test"
 }
 ```
 
