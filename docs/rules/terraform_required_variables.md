@@ -36,7 +36,7 @@ variable "cloud_creds" {
 $ tflint
 2 issue(s) found:
 
-Warning: required variable(s) not declared: module_info, module_tmpl (terraform_required_variables)
+Warning: required variable(s) not declared: var1, var2, var3, module_info, module_tmpl (terraform_required_variables)
 
   on  line 1:
    (source code not available)
@@ -45,7 +45,7 @@ Reference: https://github.com/styumyum/tflint-ruleset-yumyum/docs/rules/terrafor
 
 Warning: variable `cloud_creds` is missing the `sensitive` attribute (terraform_required_variables)
 
-  on test.tf line 1:
+  on variables.tf line 1:
    1: variable "cloud_creds" {
 
 Reference: https://github.com/styumyum/tflint-ruleset-yumyum/docs/rules/terraform_required_variables.md
@@ -74,7 +74,7 @@ variable "var1" {
 $ tflint
 1 issue(s) found:
 
-Warning: required variable(s) not declared: var2 (terraform_required_variables)
+Warning: required variable(s) not declared: var2, cloud_creds, module_info, module_tmpl (terraform_required_variables)
 
   on  line 1:
    (source code not available)
