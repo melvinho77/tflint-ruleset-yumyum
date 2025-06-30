@@ -5,7 +5,7 @@ Disallow `variable` declarations with type `any`.
 ## Configuration
 
 | Name        | Default | Value          |
-|-------------|---------|----------------|
+| ----------- | ------- | -------------- |
 | enabled     | true    | Boolean        |
 | ignore_vars | []      | List of string |
 
@@ -45,7 +45,6 @@ Warning: variable 'my_var' has 'any' type declared (terraform_any_type_variables
 
 Reference: https://github.com/styumyum/tflint-ruleset-yumyum/docs/rules/terraform_any_type_variables.md
 ```
-
 
 ### Disable for specified variables
 

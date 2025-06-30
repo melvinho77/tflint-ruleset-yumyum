@@ -4,19 +4,22 @@ Check the sequences and format of `source`, `count`, `for_each`, `providers` and
 `provider` meta arguments in Terraform `module`, `resource` and `data source`.
 
 ## Terraform `module`
+
 ### Format
+
 - Check the beginning arguments sequences in Terraform modules as the following:
-  1. `module` definition *(end with newline)*
-  2. `source` *(end with newline)*
+  1. `module` definition _(end with newline)_
+  2. `source` _(end with newline)_
   3. -- if `count` or `for_each` exist --
-      1. `count`/`for_each` *(end with newline)*
-      2. *(extra newline)*
+     1. `count`/`for_each` _(end with newline)_
+     2. _(extra newline)_
   4. -- if `providers` exist --
-      1. `providers` *(end with newline)*
-      2. *(extra newline)*
+     1. `providers` _(end with newline)_
+     2. _(extra newline)_
   5. other attributes/blocks
 
 ### Valid example
+
 ```hcl
 module "alicloud_ecs_instances" {
   source = "./alicloud-ecs-instance/"
@@ -44,20 +47,23 @@ module "aws_ec2_instance" {
 ```
 
 ## Terraform `resource` and `data source`
+
 ### Format
+
 - Check the beginning arguments sequences in Terraform resources and data sources
   as the following:
-  1. `resource` definition *(end with newline)*
+  1. `resource` definition _(end with newline)_
   2. -- if `count` or `for_each` exist --
-      1. `count`/`for_each` *(end with newline)*
-      2. *(extra newline)*
+     1. `count`/`for_each` _(end with newline)_
+     2. _(extra newline)_
   3. -- if `provider` exist --
-      1. `provider` *(end with newline)*
-      2. *(extra newline)*
+     1. `provider` _(end with newline)_
+     2. _(extra newline)_
   4. other attributes/blocks
 - `lifecycle{}` block must be placed as last block at the end of the resource without extra new lines.
 
 ## Valid example
+
 ```hcl
 resource "aws_ec2_instance" "my_instance" {
   count = 3
